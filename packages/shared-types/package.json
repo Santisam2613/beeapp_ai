@@ -9,7 +9,7 @@
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@beeapp/config": "workspace:*",
+    "@beeapp/config": "*",
     "typescript": "^5.4.0"
   }
 }

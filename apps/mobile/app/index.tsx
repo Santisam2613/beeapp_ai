@@ -17,9 +17,9 @@ export default function SplashScreen() {
       useNativeDriver: true,
     }).start();
 
-    // Show custom splash for 2.5 seconds, then navigate to main placeholder
+    // Show custom splash for 2.5 seconds, then navigate to login
     const timer = setTimeout(() => {
-      router.replace('/(main)');
+      router.replace('/(auth)/login');
     }, 2500);
 
     return () => clearTimeout(timer);

@@ -27,7 +27,9 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-dev-client",
+      "./withMonorepoSettings.js"
     ]
   }
 }

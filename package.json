@@ -1,7 +1,10 @@
 {
   "name": "beeapp-monorepo",
   "private": true,
-  "packageManager": "pnpm@10.28.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "build:admin": "turbo build --filter=@beeapp/admin-web...",
@@ -11,10 +14,15 @@
     "clean": "turbo clean"
   },
   "devDependencies": {
+    "expo": "~51.0.0",
+    "react-native": "0.74.5",
     "turbo": "^2.0.0",
     "typescript": "^5.4.0"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "react-native": "0.74.5"
   }
 }
