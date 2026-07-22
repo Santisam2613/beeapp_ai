@@ -115,26 +115,8 @@ const titleStyle: React.CSSProperties = {
   marginBottom: '8px',
 };
 
-const subtitleStyle: React.CSSProperties = {
-  fontSize: '14px',
-  color: '#6C757D',
-  textAlign: 'center',
-  marginBottom: '32px',
-  lineHeight: '1.5',
-};
-
 const inputGroupStyle: React.CSSProperties = {
   marginBottom: '24px',
-};
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: '12px',
-  fontWeight: '600',
-  color: '#495057',
-  textTransform: 'uppercase',
-  letterSpacing: '0.5px',
-  marginBottom: '8px',
 };
 
 const phoneRowStyle: React.CSSProperties = {

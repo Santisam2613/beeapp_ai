@@ -1,8 +1,10 @@
 {
   "name": "beeapp-monorepo",
   "private": true,
+  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "build": "turbo build",
+    "build:admin": "turbo build --filter=@beeapp/admin-web...",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
