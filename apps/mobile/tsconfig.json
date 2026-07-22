@@ -1,0 +1,12 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@beeapp/design-system": ["../../packages/design-system"],
+      "@beeapp/shared-types": ["../../packages/shared-types"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"]
+}

@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "BeeApp AI",
+    "slug": "beeapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/logo.png",
+    "scheme": "beeapp",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./src/assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#6025d2"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.beeapp.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/logo.png",
+        "backgroundColor": "#6025d2"
+      },
+      "package": "com.beeapp.mobile"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}
