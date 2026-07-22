@@ -24,6 +24,12 @@
     "node": ">=18.0.0"
   },
   "overrides": {
-    "react-native": "0.74.5"
+    "react-native": "0.74.5",
+    "expo-constants": "~16.0.2",
+    "expo-linking": "~6.3.1"
+  },
+  "dependencies": {
+    "expo-constants": "16.0.2",
+    "expo-linking": "6.3.1"
   }
 }

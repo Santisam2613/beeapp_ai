@@ -18,7 +18,9 @@ if (fs.existsSync(routerDir)) {
       // If the file is hoisted to the root, we need to point to apps/mobile/app
       // If it is in apps/mobile/node_modules, we need to point to ../../app
       const isRoot = routerDir === rootRouterDir;
-      const appPath = isRoot ? '"./apps/mobile/app"' : '"../../app"';
+      // When hoisted to root, expo-router is at node_modules/expo-router/
+      // require.context paths are relative to that location, so we need ../../apps/mobile/app
+      const appPath = isRoot ? '"../../apps/mobile/app"' : '"../../app"';
       
       content = content.replace(/process\.env\.EXPO_ROUTER_APP_ROOT/g, appPath);
       content = content.replace(/process\.env\.EXPO_ROUTER_IMPORT_MODE/g, '"sync"');
