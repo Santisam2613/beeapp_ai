@@ -15,15 +15,17 @@ if (fs.existsSync(routerDir)) {
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf8');
       
-      // If the file is hoisted to the root, we need to point to apps/mobile/app
-      // If it is in apps/mobile/node_modules, we need to point to ../../app
+      // If the file is hoisted to the root, we need to point to "../../apps/mobile/app" relative to node_modules/expo-router/
+      // If it is in apps/mobile/node_modules, we need to point to "../../app"
       const isRoot = routerDir === rootRouterDir;
-      // When hoisted to root, expo-router is at node_modules/expo-router/
-      // require.context paths are relative to that location, so we need ../../apps/mobile/app
       const appPath = isRoot ? '"../../apps/mobile/app"' : '"../../app"';
       
-      content = content.replace(/process\.env\.EXPO_ROUTER_APP_ROOT/g, appPath);
-      content = content.replace(/process\.env\.EXPO_ROUTER_IMPORT_MODE/g, '"sync"');
+      // Robust replacement: find the first argument of require.context and replace it
+      content = content.replace(/require\.context\(\s*[\s\S]*?,\s*true/g, `require.context(\n  ${appPath},\n  true`);
+      
+      // Robust replacement: find the fourth argument of require.context (import mode) and replace it with "sync"
+      content = content.replace(/(true,\s*\/.*?\/,\s*)[\s\S]*?(\s*\);)/g, `$1"sync"$2`);
+      
       fs.writeFileSync(filePath, content);
     }
   });
