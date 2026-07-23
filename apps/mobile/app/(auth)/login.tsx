@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { colors } from '@beeapp/design-system';
 
 declare const require: any;
 
@@ -34,6 +35,34 @@ export default function LoginScreen() {
     });
   };
 
+  // TEMPORAL DEVELOPMENT BYPASS: Double tap skips OTP & Onboarding directly to main dashboard
+  // Single tap proceeds to verify OTP and onboarding account setup.
+  // TODO: Remove this shortcut when real auth verification/user checking flow is implemented.
+  const lastTap = useRef<number>(0);
+  const tapTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handlePress = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTap.current < DOUBLE_TAP_DELAY) {
+      if (tapTimeout.current) {
+        clearTimeout(tapTimeout.current);
+        tapTimeout.current = null;
+      }
+      router.replace('/(main)');
+    } else {
+      if (tapTimeout.current) {
+        clearTimeout(tapTimeout.current);
+      }
+      tapTimeout.current = setTimeout(() => {
+        handleContinue();
+        tapTimeout.current = null;
+      }, DOUBLE_TAP_DELAY);
+    }
+    lastTap.current = now;
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -42,20 +71,20 @@ export default function LoginScreen() {
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.innerContainer}>
-            {/* Top Logo */}
-            <View style={styles.logoContainer}>
-              <Image
-                source={require('../../src/assets/logoletras.png')}
-                style={styles.logo}
-                resizeMode="contain"
-              />
-            </View>
-
-            {/* Main Content */}
+            {/* Main Content Container */}
             <View style={styles.contentContainer}>
+              {/* Circular Logo, larger and closer to the title */}
+              <View style={styles.logoContainer}>
+                <Image
+                  source={require('../../src/assets/logo.png')}
+                  style={styles.logo}
+                  resizeMode="cover"
+                />
+              </View>
+
               <Text style={styles.title}>Inicia Sesión</Text>
               <Text style={styles.subtitle}>
-                Ingresa tu número celular para acceder a tu espacio de trabajo.
+                Ingresa tu número celular para continuar.
               </Text>
 
               {/* Phone Input Box */}
@@ -72,7 +101,7 @@ export default function LoginScreen() {
                   <TextInput
                     style={styles.phoneInput}
                     placeholder="300 000 0000"
-                    placeholderTextColor="#ADB5BD"
+                    placeholderTextColor={colors.neutral.gray500}
                     keyboardType="number-pad"
                     maxLength={10}
                     value={phoneNumber}
@@ -89,18 +118,10 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={styles.primaryButton}
                 activeOpacity={0.8}
-                onPress={handleContinue}
+                onPress={handlePress}
               >
                 <Text style={styles.primaryButtonText}>Continuar</Text>
               </TouchableOpacity>
-
-              {/* Toggle to Register */}
-              <View style={styles.toggleRow}>
-                <Text style={styles.toggleText}>¿No tienes cuenta? </Text>
-                <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                  <Text style={styles.toggleLink}>Regístrate</Text>
-                </TouchableOpacity>
-              </View>
             </View>
 
             {/* Legal Footer */}
@@ -128,7 +149,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8F9FC',
+    backgroundColor: colors.neutral.gray50,
   },
   container: {
     flex: 1,
@@ -141,12 +162,15 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: Platform.OS === 'android' ? 24 : 12,
-    marginBottom: 8,
+    marginBottom: 20,
+    marginTop: Platform.OS === 'ios' ? 40 : 20,
   },
   logo: {
-    width: 220,
-    height: 70,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: colors.neutral.gray200,
   },
   contentContainer: {
     flex: 1,
@@ -156,26 +180,26 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '700',
-    color: '#1A1A2E',
+    color: colors.neutral.text,
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6C757D',
+    color: colors.neutral.gray600,
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 20,
     paddingHorizontal: 12,
   },
   inputCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.neutral.white,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E9ECEF',
-    shadowColor: '#6025d2',
+    borderColor: colors.neutral.gray200,
+    shadowColor: colors.brand.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -184,7 +208,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#495057',
+    color: colors.neutral.gray700,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 10,
@@ -196,7 +220,7 @@ const styles = StyleSheet.create({
   prefixBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F3F5',
+    backgroundColor: colors.neutral.gray100,
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 10,
@@ -209,27 +233,27 @@ const styles = StyleSheet.create({
   prefixText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1A1A2E',
+    color: colors.neutral.text,
   },
   phoneInput: {
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: '#1A1A2E',
+    color: colors.neutral.text,
     paddingVertical: 8,
     letterSpacing: 1,
   },
   errorText: {
-    color: '#F44336',
+    color: colors.semantic.error,
     fontSize: 12,
     marginTop: 8,
   },
   primaryButton: {
-    backgroundColor: '#6025d2',
+    backgroundColor: colors.brand.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#6025d2',
+    shadowColor: colors.brand.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
@@ -237,24 +261,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: colors.neutral.white,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 0.5,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  toggleText: {
-    fontSize: 14,
-    color: '#6C757D',
-  },
-  toggleLink: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#6025d2',
   },
   footer: {
     alignItems: 'center',
@@ -262,7 +272,7 @@ const styles = StyleSheet.create({
   },
   footerNotice: {
     fontSize: 12,
-    color: '#ADB5BD',
+    color: colors.neutral.gray500,
     marginBottom: 4,
   },
   footerLinksRow: {
@@ -272,10 +282,10 @@ const styles = StyleSheet.create({
   footerLink: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6025d2',
+    color: colors.brand.primary,
   },
   footerDot: {
     fontSize: 12,
-    color: '#ADB5BD',
+    color: colors.neutral.gray500,
   },
 });
