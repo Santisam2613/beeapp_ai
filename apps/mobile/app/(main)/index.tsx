@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Modal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@beeapp/design-system';
@@ -17,19 +18,32 @@ import {
   FileText,
   Folder,
   Calendar,
-  Phone,
   Users,
   MessageCircle,
   ChevronRight,
+  Settings,
 } from 'lucide-react-native';
 import FloatingTabBar from '../../src/components/FloatingTabBar';
 import AssistantMiniChat from '../../src/components/AssistantMiniChat';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+const MODULES_POOL = [
+  { id: 'mail', name: 'Correos', icon: Mail, bgColor: '#EBF5FF', iconColor: '#1E88E5' },
+  { id: 'notes', name: 'Notas', icon: FileText, bgColor: '#FEF3C7', iconColor: '#D97706' },
+  { id: 'contacts', name: 'Contactos', icon: Users, bgColor: '#FEE2E2', iconColor: '#DC2626' },
+  { id: 'files', name: 'Almacenamiento', icon: Folder, bgColor: '#ECFDF5', iconColor: '#059669' },
+  { id: 'calendar', name: 'Calendario', icon: Calendar, bgColor: '#F3E8FF', iconColor: '#7C3AED' },
+];
+
 export default function HomeScreen() {
   const router = useRouter();
   const [chatVisible, setChatVisible] = useState(false);
+
+  // Customization of quick accesses state (default to Correo, Notas, Contactos)
+  const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>(['mail', 'notes', 'contacts']);
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [tempSelectedModuleIds, setTempSelectedModuleIds] = useState<string[]>(['mail', 'notes', 'contacts']);
 
   // Mock User Info
   const user = {
@@ -38,17 +52,26 @@ export default function HomeScreen() {
   };
 
   const handleGridItemPress = (section: string) => {
-    router.push({
-      pathname: '/(main)/explore',
-      params: { section },
-    });
+    if (section === 'mail') {
+      router.push('/(main)/mail');
+    } else if (section === 'notes') {
+      router.push('/(main)/notes');
+    } else if (section === 'files') {
+      router.push('/(main)/storage');
+    } else if (section === 'contacts') {
+      router.push('/(main)/contacts');
+    } else if (section === 'calendar') {
+      router.push('/(main)/calendar');
+    } else {
+      router.push({
+        pathname: '/(main)/explore',
+        params: { section },
+      });
+    }
   };
 
   const handleVerMasEvents = () => {
-    router.push({
-      pathname: '/(main)/explore',
-      params: { section: 'calendar' },
-    });
+    router.push('/(main)/calendar');
   };
 
   return (
@@ -73,7 +96,11 @@ export default function HomeScreen() {
             </View>
           </View>
           {/* Notification Badge */}
-          <TouchableOpacity style={styles.notificationBtn} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.notificationBtn}
+            onPress={() => router.push('/(main)/notifications')}
+            activeOpacity={0.7}
+          >
             <Bell size={22} color={colors.neutral.text} />
             <View style={styles.badge}>
               <Text style={styles.badgeText}>3</Text>
@@ -146,50 +173,49 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Quick Access Grid (6 icons, 3x2 aligned perfectly) */}
-        <Text style={styles.sectionHeader}>Accesos Rápidos</Text>
+        {/* Quick Access Grid (Customizable, showing exactly 3 elements) */}
+        <View style={styles.sectionHeaderRow}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={[styles.sectionHeader, { marginBottom: 0 }]}>Accesos Rápidos</Text>
+            <TouchableOpacity
+              onPress={() => {
+                setTempSelectedModuleIds([...selectedModuleIds]);
+                setIsCustomizing(true);
+              }}
+              style={{ marginLeft: 8 }}
+              activeOpacity={0.7}
+            >
+              <Settings size={16} color={colors.brand.primary} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/(main)/explore')} activeOpacity={0.7}>
+            <Text style={styles.verMasLink}>Ver más</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.gridContainer}>
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('mail')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#EBF5FF' }]}>
-              <Mail size={22} color="#1E88E5" />
-            </View>
-            <Text style={styles.gridLabel}>Correo</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('notes')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#FEF3C7' }]}>
-              <FileText size={22} color="#D97706" />
-            </View>
-            <Text style={styles.gridLabel}>Notas</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('files')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#ECFDF5' }]}>
-              <Folder size={22} color="#059669" />
-            </View>
-            <Text style={styles.gridLabel}>Archivos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('calendar')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#F3E8FF' }]}>
-              <Calendar size={22} color="#7C3AED" />
-            </View>
-            <Text style={styles.gridLabel}>Calendario</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('calls')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#E0F2FE' }]}>
-              <Phone size={22} color="#0284C7" />
-            </View>
-            <Text style={styles.gridLabel}>Llamadas</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.gridItem} onPress={() => handleGridItemPress('contacts')} activeOpacity={0.7}>
-            <View style={[styles.gridIconWrap, { backgroundColor: '#FEE2E2' }]}>
-              <Users size={22} color="#DC2626" />
-            </View>
-            <Text style={styles.gridLabel}>Contactos</Text>
-          </TouchableOpacity>
+          {selectedModuleIds.map((id) => {
+            const item = MODULES_POOL.find((m) => m.id === id);
+            if (!item) return null;
+            const IconComponent = item.icon;
+            return (
+              <TouchableOpacity
+                key={id}
+                style={styles.gridItem}
+                onPress={() => handleGridItemPress(id)}
+                onLongPress={() => {
+                  setTempSelectedModuleIds([...selectedModuleIds]);
+                  setIsCustomizing(true);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.gridIconWrap, { backgroundColor: item.bgColor }]}>
+                  <IconComponent size={22} color={item.iconColor} />
+                </View>
+                <Text style={styles.gridLabel}>{item.name}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Recent Activity Section */}
@@ -272,6 +298,94 @@ export default function HomeScreen() {
 
       {/* Mini Chat Modal triggered from Suggestion chips or AI button */}
       <AssistantMiniChat visible={chatVisible} onClose={() => setChatVisible(false)} />
+
+      {/* Personalization Modal */}
+      <Modal transparent visible={isCustomizing} animationType="slide">
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Personalizar Accesos</Text>
+              <Text style={styles.modalSubtitle}>
+                Selecciona exactamente 3 accesos rápidos para tu pantalla de inicio.
+              </Text>
+              <Text style={styles.selectionCounter}>
+                {tempSelectedModuleIds.length} de 3 seleccionados
+              </Text>
+            </View>
+
+            <ScrollView style={styles.modulesScroll} showsVerticalScrollIndicator={false}>
+              <View style={styles.modulesModalList}>
+                {MODULES_POOL.map((item) => {
+                  const isSelected = tempSelectedModuleIds.includes(item.id);
+                  const IconComponent = item.icon;
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      style={[styles.modalModuleItem, isSelected && styles.modalModuleItemActive]}
+                      onPress={() => {
+                        if (isSelected) {
+                          setTempSelectedModuleIds(tempSelectedModuleIds.filter(id => id !== item.id));
+                        } else {
+                          if (tempSelectedModuleIds.length >= 3) {
+                            alert('Solo puedes seleccionar un máximo de 3 accesos rápidos.');
+                            return;
+                          }
+                          setTempSelectedModuleIds([...tempSelectedModuleIds, item.id]);
+                        }
+                      }}
+                      activeOpacity={0.8}
+                    >
+                      <View style={[styles.modalModuleIconWrap, { backgroundColor: item.bgColor }]}>
+                        <IconComponent size={20} color={item.iconColor} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalModuleName}>{item.name}</Text>
+                        <Text style={styles.modalModuleDesc}>
+                          {item.id === 'mail' ? 'Bandeja de entrada y correos' :
+                           item.id === 'notes' ? 'Notas y apuntes personales' :
+                           item.id === 'contacts' ? 'Buscador de red empresarial y contactos' :
+                           item.id === 'files' ? 'Archivos y firma digital de documentos' :
+                           item.id === 'calendar' ? 'Calendario y agenda de eventos' :
+                           'Historial de llamadas entrantes y salientes'}
+                        </Text>
+                      </View>
+                      <View style={[styles.checkboxCircle, isSelected && styles.checkboxCircleActive]}>
+                        {isSelected && <View style={styles.checkboxCircleInner} />}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </ScrollView>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
+                onPress={() => setIsCustomizing(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.modalSaveBtn,
+                  tempSelectedModuleIds.length !== 3 && styles.modalSaveBtnDisabled
+                ]}
+                disabled={tempSelectedModuleIds.length !== 3}
+                onPress={() => {
+                  setSelectedModuleIds(tempSelectedModuleIds);
+                  setIsCustomizing(false);
+                  alert('Accesos rápidos actualizados.');
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.modalSaveBtnText}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -614,5 +728,133 @@ const styles = StyleSheet.create({
   eventMeta: {
     fontSize: 11,
     color: colors.neutral.gray600,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(26, 26, 46, 0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: colors.neutral.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.neutral.text,
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 12,
+    color: colors.neutral.gray600,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  selectionCounter: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.brand.primary,
+    backgroundColor: '#F3E8FF',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  modulesScroll: {
+    marginBottom: 20,
+  },
+  modulesModalList: {
+    gap: 12,
+  },
+  modalModuleItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+    backgroundColor: colors.neutral.white,
+  },
+  modalModuleItemActive: {
+    borderColor: colors.brand.primary,
+    backgroundColor: '#FBFBFF',
+  },
+  modalModuleIconWrap: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modalModuleName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.neutral.text,
+    marginBottom: 2,
+  },
+  modalModuleDesc: {
+    fontSize: 11,
+    color: colors.neutral.gray600,
+  },
+  checkboxCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.neutral.gray300,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
+  },
+  checkboxCircleActive: {
+    borderColor: colors.brand.primary,
+  },
+  checkboxCircleInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.brand.primary,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.neutral.gray200,
+    paddingTop: 16,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray300,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  modalCancelBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.neutral.gray700,
+  },
+  modalSaveBtn: {
+    flex: 1,
+    backgroundColor: colors.brand.primary,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  modalSaveBtnDisabled: {
+    backgroundColor: colors.neutral.gray400,
+  },
+  modalSaveBtnText: {
+    color: colors.neutral.white,
+    fontSize: 14,
+    fontWeight: '700',
   },
 });

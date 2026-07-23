@@ -1,0 +1,746 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+  Dimensions,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { colors } from '@beeapp/design-system';
+import {
+  ChevronLeft,
+  Search,
+  Grid,
+  List,
+  Star,
+  Clock,
+  Plus,
+  Trash2,
+  Edit2,
+  FolderOpen,
+  ArrowUpDown,
+} from 'lucide-react-native';
+import FloatingTabBar from '../../../src/components/FloatingTabBar';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const FAB_BOTTOM_OFFSET = 105; // Spacing offset to separate FAB from FloatingTabBar
+
+interface NoteItem {
+  id: string;
+  title: string;
+  content: string;
+  updatedAt: string; // ISO String format
+  createdAt: string; // ISO String format
+  isFavorite: boolean;
+  colorTag: string; // Hex representation
+  reminderDate?: string; // Mock string date
+  folder: 'notes' | 'trash';
+}
+
+export default function NotesListScreen() {
+  const router = useRouter();
+
+  // Layout states
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'reminder' | 'favorite' | 'trash'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState<'updated' | 'created' | 'alpha'>('updated');
+  const [swipeActiveId, setSwipeActiveId] = useState<string | null>(null);
+
+  // Mock Notes list data
+  const [notes, setNotes] = useState<NoteItem[]>([
+    {
+      id: 'n1',
+      title: 'Ideas campaña de Marketing',
+      content: '1. Usar videos de formato corto en TikTok sobre BeeApp.\n2. Contactar micro-influencers del sector Pymes.\n3. Crear descuentos por recomendación directa.',
+      updatedAt: '2026-07-23T10:00:00Z',
+      createdAt: '2026-07-20T08:00:00Z',
+      isFavorite: true,
+      colorTag: '#A78BFA', // Purple
+      folder: 'notes',
+    },
+    {
+      id: 'n2',
+      title: 'Lista de compras corporativas',
+      content: 'Comprar los siguientes insumos para la oficina de Bogotá:\n- 3 resmas de papel carta.\n- Cafetera nueva de filtro.\n- Teclados y mouse ergonómicos.',
+      updatedAt: '2026-07-22T14:30:00Z',
+      createdAt: '2026-07-22T14:00:00Z',
+      isFavorite: false,
+      colorTag: '#F472B6', // Pink
+      reminderDate: '28 Jul • 10:00 AM',
+      folder: 'notes',
+    },
+    {
+      id: 'n3',
+      title: 'Estrategia de Ventas Q4',
+      content: 'Definir metas de equipo y metas individuales. Implementar el nuevo CRM. Mejorar los tiempos de respuesta del soporte BeeAI.',
+      updatedAt: '2026-07-21T09:00:00Z',
+      createdAt: '2026-07-15T11:00:00Z',
+      isFavorite: true,
+      colorTag: '#60A5FA', // Blue
+      folder: 'notes',
+    },
+    {
+      id: 'n4',
+      title: 'Claves del Servidor Temp',
+      content: 'Claves temporales para base de datos local y puertos habilitados en el router corporativo. Eliminar este archivo el lunes.',
+      updatedAt: '2026-07-19T17:15:00Z',
+      createdAt: '2026-07-19T17:00:00Z',
+      isFavorite: false,
+      colorTag: '#FB923C', // Orange
+      folder: 'notes',
+    },
+    {
+      id: 'n5',
+      title: 'Nota borrada antigua',
+      content: 'Esto es una prueba de papelera. Contenido viejo que ya no sirve y fue desechado por el usuario.',
+      updatedAt: '2026-07-10T12:00:00Z',
+      createdAt: '2026-07-10T12:00:00Z',
+      isFavorite: false,
+      colorTag: '#9CA3AF', // Gray
+      folder: 'trash',
+    },
+  ]);
+
+  const handleToggleFavorite = (id: string, e: any) => {
+    e.stopPropagation();
+    setNotes(
+      notes.map((note) =>
+        note.id === id ? { ...note, isFavorite: !note.isFavorite } : note
+      )
+    );
+  };
+
+  const handleDeleteNote = (id: string, e: any) => {
+    e.stopPropagation();
+    setNotes(
+      notes.map((note) =>
+        note.id === id ? { ...note, folder: 'trash' } : note
+      )
+    );
+    setSwipeActiveId(null);
+    alert('Nota movida a la Papelera.');
+  };
+
+  const handlePermanentDelete = (id: string, e: any) => {
+    e.stopPropagation();
+    setNotes(notes.filter((n) => n.id !== id));
+    setSwipeActiveId(null);
+    alert('Nota eliminada permanentemente.');
+  };
+
+  // Filter application
+  const filteredNotes = notes.filter((note) => {
+    // 1. Search Query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      if (!note.title.toLowerCase().includes(q) && !note.content.toLowerCase().includes(q)) {
+        return false;
+      }
+    }
+
+    // 2. Folder/Filter Toggles
+    if (activeFilter === 'trash') {
+      return note.folder === 'trash';
+    } else {
+      if (note.folder !== 'notes') return false;
+      
+      if (activeFilter === 'favorite') return note.isFavorite;
+      if (activeFilter === 'reminder') return !!note.reminderDate;
+      if (activeFilter === 'recent') {
+        // Assume notes updated in the last 2 days
+        const limitDate = new Date();
+        limitDate.setDate(limitDate.getDate() - 2);
+        return new Date(note.updatedAt) >= limitDate;
+      }
+    }
+
+    return true;
+  });
+
+  // Sort application
+  const sortedNotes = [...filteredNotes].sort((a, b) => {
+    if (sortOption === 'alpha') {
+      return a.title.localeCompare(b.title);
+    }
+    if (sortOption === 'created') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    }
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
+
+  const handleSelectSort = () => {
+    const options: Array<typeof sortOption> = ['updated', 'created', 'alpha'];
+    const nextIdx = (options.indexOf(sortOption) + 1) % options.length;
+    setSortOption(options[nextIdx]);
+  };
+
+  const getSortLabel = () => {
+    if (sortOption === 'alpha') return 'A-Z';
+    if (sortOption === 'created') return 'Creado';
+    return 'Modificado';
+  };
+
+  const hasNotes = sortedNotes.length > 0;
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header toolbar */}
+        <View style={styles.header}>
+          <View style={styles.headerLeftCol}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+              <ChevronLeft size={24} color={colors.neutral.text} />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>Mis Notas</Text>
+          </View>
+
+          <View style={styles.headerRightCol}>
+            <TouchableOpacity onPress={handleSelectSort} style={styles.sortToggleBtn} activeOpacity={0.7}>
+              <ArrowUpDown size={16} color={colors.brand.primary} style={{ marginRight: 4 }} />
+              <Text style={styles.sortToggleText}>{getSortLabel()}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+              style={styles.layoutToggleBtn}
+              activeOpacity={0.7}
+            >
+              {viewMode === 'grid' ? (
+                <List size={20} color={colors.neutral.text} />
+              ) : (
+                <Grid size={20} color={colors.neutral.text} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchBarBox}>
+          <Search size={18} color={colors.neutral.gray500} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar notas..."
+            placeholderTextColor={colors.neutral.gray500}
+            value={searchQuery}
+            onChangeText={(txt) => {
+              setSearchQuery(txt);
+              setSwipeActiveId(null);
+            }}
+          />
+        </View>
+
+        {/* Horizontal Navigation filter chips */}
+        <View style={styles.filtersContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filtersScroll}>
+            {[
+              { id: 'all', label: 'Todas' },
+              { id: 'recent', label: 'Recientes' },
+              { id: 'reminder', label: 'Con recordatorio' },
+              { id: 'favorite', label: 'Favoritas' },
+              { id: 'trash', label: 'Papelera' },
+            ].map((chip) => {
+              const isActive = activeFilter === chip.id;
+              return (
+                <TouchableOpacity
+                  key={chip.id}
+                  style={[styles.filterChip, isActive && styles.filterChipActive]}
+                  onPress={() => {
+                    setActiveFilter(chip.id as any);
+                    setSwipeActiveId(null);
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>
+                    {chip.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Notes listing area */}
+        {hasNotes ? (
+          <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            {viewMode === 'grid' ? (
+              // Two column Grid Layout
+              <View style={styles.notesGrid}>
+                {sortedNotes.map((note) => {
+                  const isSwipeActive = swipeActiveId === note.id;
+                  return (
+                    <TouchableOpacity
+                      key={note.id}
+                      style={[styles.noteCardGrid, { borderLeftColor: note.colorTag }]}
+                      onPress={() => router.push({ pathname: '/(main)/notes/edit', params: { id: note.id } })}
+                      onLongPress={() => setSwipeActiveId(isSwipeActive ? null : note.id)}
+                      activeOpacity={0.7}
+                    >
+                      {/* Card Header title */}
+                      <View style={styles.cardHeader}>
+                        <Text style={styles.cardTitle} numberOfLines={2}>
+                          {note.title || 'Sin Título'}
+                        </Text>
+                      </View>
+
+                      {/* Content Preview */}
+                      <Text style={styles.cardContent} numberOfLines={4}>
+                        {note.content}
+                      </Text>
+
+                      {/* Footer info: date and actions */}
+                      <View style={styles.cardFooter}>
+                        {note.reminderDate ? (
+                          <View style={styles.reminderBadge}>
+                            <Clock size={10} color="#D97706" style={{ marginRight: 2 }} />
+                            <Text style={styles.reminderText} numberOfLines={1}>{note.reminderDate.split('•')[0]}</Text>
+                          </View>
+                        ) : (
+                          <Text style={styles.dateText}>
+                            {new Date(note.updatedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                          </Text>
+                        )}
+
+                        <View style={styles.cardActionRow}>
+                          <TouchableOpacity onPress={(e) => handleToggleFavorite(note.id, e)} style={styles.smallIconBtn}>
+                            <Star
+                              size={14}
+                              color={note.isFavorite ? '#F59E0B' : colors.neutral.gray400}
+                              fill={note.isFavorite ? '#F59E0B' : 'transparent'}
+                            />
+                          </TouchableOpacity>
+                          
+                          <TouchableOpacity
+                            onPress={(e) => {
+                              if (activeFilter === 'trash') {
+                                handlePermanentDelete(note.id, e);
+                              } else {
+                                handleDeleteNote(note.id, e);
+                              }
+                            }}
+                            style={styles.smallIconBtn}
+                          >
+                            <Trash2 size={14} color={colors.neutral.gray500} />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : (
+              // Traditional Row List Layout
+              <View style={styles.notesListCol}>
+                {sortedNotes.map((note) => {
+                  const isSwipeActive = swipeActiveId === note.id;
+                  return (
+                    <View key={note.id} style={styles.listWrapper}>
+                      <TouchableOpacity
+                        style={[styles.noteRowList, { borderLeftColor: note.colorTag }]}
+                        onPress={() => router.push({ pathname: '/(main)/notes/edit', params: { id: note.id } })}
+                        onLongPress={() => setSwipeActiveId(isSwipeActive ? null : note.id)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.listDetails}>
+                          <Text style={styles.listTitle} numberOfLines={1}>
+                            {note.title || 'Sin Título'}
+                          </Text>
+                          <Text style={styles.listBody} numberOfLines={1}>
+                            {note.content}
+                          </Text>
+                          <View style={styles.listMetaRow}>
+                            <Text style={styles.dateText}>
+                              {new Date(note.updatedAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                            </Text>
+                            {note.reminderDate && (
+                              <View style={[styles.reminderBadge, { marginLeft: 10 }]}>
+                                <Clock size={10} color="#D97706" style={{ marginRight: 2 }} />
+                                <Text style={styles.reminderText}>{note.reminderDate}</Text>
+                              </View>
+                            )}
+                          </View>
+                        </View>
+
+                        <View style={styles.listActions}>
+                          <TouchableOpacity onPress={(e) => handleToggleFavorite(note.id, e)} style={styles.listIconBtn}>
+                            <Star
+                              size={16}
+                              color={note.isFavorite ? '#F59E0B' : colors.neutral.gray400}
+                              fill={note.isFavorite ? '#F59E0B' : 'transparent'}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </TouchableOpacity>
+
+                      {/* List Swipe Overlay buttons */}
+                      {isSwipeActive && (
+                        <View style={styles.swipePanel}>
+                          <TouchableOpacity
+                            style={[styles.swipeBtn, { backgroundColor: '#EEF2F6' }]}
+                            onPress={() => router.push({ pathname: '/(main)/notes/edit', params: { id: note.id } })}
+                            activeOpacity={0.8}
+                          >
+                            <Edit2 size={16} color={colors.neutral.text} />
+                            <Text style={styles.swipeBtnText}>Editar</Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={[styles.swipeBtn, { backgroundColor: '#FEE2E2' }]}
+                            onPress={(e) => {
+                              if (activeFilter === 'trash') {
+                                handlePermanentDelete(note.id, e);
+                              } else {
+                                handleDeleteNote(note.id, e);
+                              }
+                            }}
+                            activeOpacity={0.8}
+                          >
+                            <Trash2 size={16} color={colors.semantic.error} />
+                            <Text style={[styles.swipeBtnText, { color: colors.semantic.error }]}>Borrar</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+            <View style={{ height: 120 }} />
+          </ScrollView>
+        ) : (
+          // Empty State Layout
+          <View style={styles.emptyContainer}>
+            <View style={styles.emptyIconBg}>
+              <FolderOpen size={40} color={colors.neutral.gray500} />
+            </View>
+            <Text style={styles.emptyTitle}>Sin Notas</Text>
+            <Text style={styles.emptyDesc}>
+              No hay notas en esta carpeta. Haz clic en el botón flotante para escribir una nota nueva.
+            </Text>
+          </View>
+        )}
+
+        {/* Create Note Floating Action Button */}
+        <TouchableOpacity
+          style={styles.createFab}
+          onPress={() => router.push('/(main)/notes/edit')}
+          activeOpacity={0.8}
+        >
+          <Plus size={20} color={colors.neutral.white} style={{ marginRight: 6 }} />
+          <Text style={styles.createFabText}>Nueva Nota</Text>
+        </TouchableOpacity>
+
+        {/* Tab Menu navigation */}
+        <FloatingTabBar activeTab="home" />
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.neutral.gray50,
+  },
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: colors.neutral.white,
+    borderBottomWidth: 1,
+    borderColor: colors.neutral.gray100,
+  },
+  headerLeftCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtn: {
+    padding: 4,
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.neutral.text,
+  },
+  headerRightCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  sortToggleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral.gray50,
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+  },
+  sortToggleText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.neutral.text,
+  },
+  layoutToggleBtn: {
+    padding: 4,
+  },
+  searchBarBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral.white,
+    borderBottomWidth: 1,
+    borderColor: colors.neutral.gray100,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: colors.neutral.text,
+    paddingVertical: 6,
+    fontWeight: '500',
+  },
+  filtersContainer: {
+    paddingVertical: 10,
+    backgroundColor: colors.neutral.white,
+    borderBottomWidth: 1,
+    borderColor: colors.neutral.gray100,
+  },
+  filtersScroll: {
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 14,
+    backgroundColor: colors.neutral.gray50,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+  },
+  filterChipActive: {
+    backgroundColor: '#F3E8FF',
+    borderColor: colors.brand.primary,
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.neutral.gray700,
+  },
+  filterChipTextActive: {
+    color: colors.brand.primary,
+    fontWeight: '700',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  notesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 14,
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  noteCardGrid: {
+    width: (SCREEN_WIDTH - 40) / 2, // Standard grid half size minus margins
+    backgroundColor: colors.neutral.white,
+    borderRadius: 18,
+    borderLeftWidth: 5,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+    minHeight: 150,
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.01,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  cardHeader: {
+    marginBottom: 6,
+  },
+  cardTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.neutral.text,
+    lineHeight: 18,
+  },
+  cardContent: {
+    fontSize: 12,
+    color: colors.neutral.gray700,
+    lineHeight: 16,
+    marginBottom: 10,
+    flex: 1,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderColor: colors.neutral.gray100,
+    paddingTop: 8,
+    marginTop: 4,
+  },
+  dateText: {
+    fontSize: 10,
+    color: colors.neutral.gray600,
+    fontWeight: '500',
+  },
+  cardActionRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  smallIconBtn: {
+    padding: 2,
+  },
+  notesListCol: {
+    padding: 16,
+    gap: 12,
+  },
+  listWrapper: {
+    position: 'relative',
+  },
+  noteRowList: {
+    flexDirection: 'row',
+    backgroundColor: colors.neutral.white,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+    borderLeftWidth: 5,
+    padding: 14,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  listDetails: {
+    flex: 1,
+    paddingRight: 16,
+  },
+  listTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: colors.neutral.text,
+    marginBottom: 2,
+  },
+  listBody: {
+    fontSize: 12,
+    color: colors.neutral.gray700,
+    marginBottom: 6,
+  },
+  listMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  reminderBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  reminderText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#D97706',
+  },
+  listActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  listIconBtn: {
+    padding: 4,
+  },
+  swipePanel: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    width: 130,
+    zIndex: 10,
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+  },
+  swipeBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swipeBtnText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.neutral.text,
+    marginTop: 4,
+    textTransform: 'uppercase',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    paddingVertical: 120,
+  },
+  emptyIconBg: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.neutral.gray100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.neutral.text,
+    marginBottom: 8,
+  },
+  emptyDesc: {
+    fontSize: 13,
+    color: colors.neutral.gray600,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  createFab: {
+    position: 'absolute',
+    bottom: FAB_BOTTOM_OFFSET,
+    right: 20,
+    backgroundColor: colors.brand.primary,
+    borderRadius: 24,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: colors.brand.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  createFabText: {
+    color: colors.neutral.white,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+});

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Share,
   Linking,
   Alert,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@beeapp/design-system';
@@ -27,6 +28,7 @@ import FloatingTabBar from '../../../src/components/FloatingTabBar';
 
 export default function ProfileMainScreen() {
   const router = useRouter();
+  const [isVisibleInNetwork, setIsVisibleInNetwork] = useState(true);
 
   // Mock User profile info
   const userProfile = {
@@ -130,13 +132,32 @@ export default function ProfileMainScreen() {
               <ChevronRight size={16} color={colors.neutral.gray500} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.optionRow, { borderBottomWidth: 0 }]} onPress={() => navigateTo('/(main)/profile/integrations')} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.optionRow} onPress={() => navigateTo('/(main)/profile/integrations')} activeOpacity={0.7}>
               <View style={[styles.optionIconWrap, { backgroundColor: '#EBF5FF' }]}>
                 <Grid size={18} color="#1E88E5" />
               </View>
               <Text style={styles.optionLabel}>Integraciones Externas</Text>
               <ChevronRight size={16} color={colors.neutral.gray500} />
             </TouchableOpacity>
+
+            {/* Visibility toggle switch */}
+            <View style={styles.switchOptionRow}>
+              <View style={[styles.optionIconWrap, { backgroundColor: '#F3E8FF' }]}>
+                <Shield size={18} color="#7C3AED" />
+              </View>
+              <View style={styles.switchTextCol}>
+                <Text style={styles.optionLabel}>Visibilidad en la red</Text>
+                <Text style={styles.switchDesc}>
+                  Permite que otros usuarios te encuentren según tu profesión, empresa e intereses registrados.
+                </Text>
+              </View>
+              <Switch
+                value={isVisibleInNetwork}
+                onValueChange={setIsVisibleInNetwork}
+                trackColor={{ false: '#E5E7EB', true: '#C084FC' }}
+                thumbColor={isVisibleInNetwork ? '#7C3AED' : '#F3F4F6'}
+              />
+            </View>
           </View>
 
           {/* Group 2: Aplicación */}
@@ -375,6 +396,23 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: colors.neutral.gray500,
     textAlign: 'center',
+    fontWeight: '500',
+  },
+  switchOptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  switchTextCol: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  switchDesc: {
+    fontSize: 10,
+    color: colors.neutral.gray600,
+    marginTop: 2,
+    lineHeight: 14,
     fontWeight: '500',
   },
 });
