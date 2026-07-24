@@ -1460,6 +1460,13 @@ body {
   color: #6025d2;
 }
 
+.table-row-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: #E9ECEF;
+  color: #6C757D;
+}
+
 /* ==========================================================================
    Plan management cards (suscripciones page)
    ========================================================================== */
@@ -2232,4 +2239,180 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+/* ==========================================================================
+   Editor de planes (src/app/dashboard/suscripciones/PlanEditor.tsx)
+   ========================================================================== */
+
+button.back-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.plan-editor-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.plan-editor-header .back-link {
+  margin-bottom: 4px;
+}
+
+.plan-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.form-hint {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: #ADB5BD;
+  line-height: 16px;
+}
+
+.plan-limits-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+  gap: 12px;
+}
+
+.feature-toggle-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #F1F3F5;
+}
+
+.feature-toggle-row:last-child {
+  border-bottom: none;
+}
+
+.feature-toggle-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  background-color: #DEE2E6;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.toggle-switch.on {
+  background-color: #6025d2;
+}
+
+.toggle-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+}
+
+.toggle-switch.on .toggle-switch-knob {
+  transform: translateX(16px);
+}
+
+.feature-edit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.feature-edit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #F1F3F5;
+  border-radius: 10px;
+  padding: 8px 8px 8px 14px;
+}
+
+.feature-edit-text {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1A1A2E;
+  min-width: 0;
+}
+
+.feature-edit-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.feature-add-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.feature-add-row .form-field-input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.plan-preview-card {
+  background-color: #FFFFFF;
+  border: 2px solid #E9ECEF;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-preview-annual {
+  font-size: 12px;
+  font-weight: 750;
+  color: #6025d2;
+}
+
+.plan-preview-limits {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #F1F3F5;
+}
+
+.plan-preview-limit-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #6C757D;
+}
+
+.plan-preview-limit-item svg {
+  color: #ADB5BD;
+  flex-shrink: 0;
 }

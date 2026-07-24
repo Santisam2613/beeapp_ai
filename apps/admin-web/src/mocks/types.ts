@@ -85,6 +85,21 @@ export interface UserSanction {
   adminResponsable: string;
 }
 
+export interface PlanLimits {
+  almacenamientoGB: number;
+  dispositivos: number;
+  ofertasPerfil: number;
+}
+
+export type PlanFeatureKey =
+  | 'sinPublicidad'
+  | 'copiasNube'
+  | 'chatsOcultos'
+  | 'firmaDigital'
+  | 'historialVersiones'
+  | 'catalogoAvanzado'
+  | 'perfilDestacado';
+
 export interface Plan {
   id: PlanId;
   nombre: string;
@@ -94,6 +109,8 @@ export interface Plan {
   caracteristicas: string[];
   usuariosActivos: number;
   color: string;
+  limites: PlanLimits;
+  funciones: Record<PlanFeatureKey, boolean>;
 }
 
 export interface Transaction {
