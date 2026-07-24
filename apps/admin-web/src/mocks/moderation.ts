@@ -1,0 +1,81 @@
+import type { UserReport, UserSanction } from './types';
+
+export const MOCK_REPORTS: UserReport[] = [
+  {
+    id: 'rep_001',
+    usuarioReportadoId: 'usr_002',
+    reportadoPor: 'Camila Herrera',
+    motivo: 'acoso',
+    detalle: 'Envío de mensajes repetidos con contenido intimidante durante una gestión de soporte interno.',
+    contenidoReportado: 'Si no me respondes ahora mismo vas a tener problemas serios.',
+    fecha: '2026-06-28T10:15:00',
+    estado: 'revisado',
+  },
+  {
+    id: 'rep_002',
+    usuarioReportadoId: 'usr_002',
+    reportadoPor: 'Diego Fernández',
+    motivo: 'contenido_inapropiado',
+    detalle: 'Comentario fuera de lugar en un canal compartido del área de Finanzas.',
+    contenidoReportado: 'Comentario reportado por lenguaje ofensivo.',
+    fecha: '2026-07-05T15:40:00',
+    estado: 'revisado',
+  },
+  {
+    id: 'rep_003',
+    usuarioReportadoId: 'usr_009',
+    reportadoPor: 'Santiago Vargas',
+    motivo: 'spam',
+    detalle: 'Envío masivo de enlaces promocionales no solicitados a varios usuarios del directorio.',
+    contenidoReportado: 'Mira esta oferta increíble, haz clic aquí: bit.ly/xxxxx',
+    fecha: '2026-05-10T09:00:00',
+    estado: 'revisado',
+  },
+  {
+    id: 'rep_004',
+    usuarioReportadoId: 'usr_004',
+    reportadoPor: 'María Gómez',
+    motivo: 'suplantacion',
+    detalle: 'El perfil público en la red empresarial usa un cargo que no corresponde a su rol registrado.',
+    contenidoReportado: 'Perfil indica "Director de Operaciones", cargo no verificado.',
+    fecha: '2026-07-21T11:30:00',
+    estado: 'pendiente',
+  },
+  {
+    id: 'rep_005',
+    usuarioReportadoId: 'usr_006',
+    reportadoPor: 'Laura Ramos',
+    motivo: 'otro',
+    detalle: 'Reporte inicial por posible cuenta duplicada; tras revisión no se encontró evidencia.',
+    contenidoReportado: 'Cuenta reportada como posible duplicado.',
+    fecha: '2026-04-02T08:20:00',
+    estado: 'descartado',
+  },
+];
+
+export const MOCK_SANCTIONS: UserSanction[] = [
+  {
+    id: 'san_001',
+    usuarioId: 'usr_002',
+    tipo: 'advertencia',
+    motivo: 'Primer reporte de comportamiento inapropiado; se envió advertencia formal antes de la suspensión.',
+    fecha: '2026-06-29T09:00:00',
+    adminResponsable: 'Equipo de Confianza y Seguridad',
+  },
+  {
+    id: 'san_002',
+    usuarioId: 'usr_002',
+    tipo: 'suspension',
+    motivo: 'Reincidencia en reportes de acoso confirmados tras revisión del equipo de moderación.',
+    fecha: '2026-07-06T09:00:00',
+    adminResponsable: 'Equipo de Confianza y Seguridad',
+  },
+  {
+    id: 'san_003',
+    usuarioId: 'usr_009',
+    tipo: 'bloqueo',
+    motivo: 'Envío de spam confirmado a múltiples usuarios del directorio empresarial.',
+    fecha: '2026-05-14T10:30:00',
+    adminResponsable: 'Equipo de Confianza y Seguridad',
+  },
+];
