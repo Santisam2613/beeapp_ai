@@ -21,6 +21,7 @@ import ChartCard from '@/components/ChartCard';
 import ChartTooltip from '@/components/ChartTooltip';
 import DataTable, { type DataTableColumn } from '@/components/DataTable';
 import ActivityFeed from '@/components/ActivityFeed';
+import ChartLegend from '@/components/ChartLegend';
 import PlanBadge from '@/components/PlanBadge';
 import StatusBadge from '@/components/StatusBadge';
 import { DASHBOARD_KPIS, USER_GROWTH_SERIES, REVENUE_SERIES, PLAN_DISTRIBUTION, MODULE_USAGE_SERIES } from '@/mocks/metrics';
@@ -28,6 +29,7 @@ import { MOCK_USERS } from '@/mocks/users';
 import { MOCK_ACTIVITIES } from '@/mocks/activities';
 import type { AdminUser } from '@/mocks/types';
 import { formatCurrencyCOP, formatNumber, formatDate } from '@/utils/format';
+import { CHART_COLORS, CHART_GRID_STROKE, CHART_AXIS_TICK, CHART_AXIS_LINE, CHART_CURSOR, formatMillionsTick } from '@/utils/chart';
 
 const RANGE_OPTIONS = [
   { value: '3', label: 'Últimos 3 meses' },
@@ -103,11 +105,11 @@ export default function DashboardPage() {
           <ChartCard title="Crecimiento de usuarios" subtitle="Usuarios totales por mes">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={growthData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#F1F3F5" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={{ stroke: '#E9ECEF' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={false} tickLine={false} width={40} />
+                <CartesianGrid vertical={false} stroke={CHART_GRID_STROKE} />
+                <XAxis dataKey="label" tick={CHART_AXIS_TICK} axisLine={CHART_AXIS_LINE} tickLine={false} />
+                <YAxis tick={CHART_AXIS_TICK} axisLine={false} tickLine={false} width={40} />
                 <Tooltip content={<ChartTooltip valueFormatter={formatNumber} />} />
-                <Line type="monotone" dataKey="value" name="Usuarios" stroke="#6025d2" strokeWidth={2} dot={{ r: 4, fill: '#6025d2', stroke: '#FFFFFF', strokeWidth: 2 }} activeDot={{ r: 5 }} isAnimationActive={false} />
+                <Line type="monotone" dataKey="value" name="Usuarios" stroke={CHART_COLORS.primary} strokeWidth={2} dot={{ r: 4, fill: CHART_COLORS.primary, stroke: CHART_COLORS.surface, strokeWidth: 2 }} activeDot={{ r: 5 }} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -115,11 +117,11 @@ export default function DashboardPage() {
           <ChartCard title="Ingresos por mes" subtitle="Ingresos totales facturados">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueData} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#F1F3F5" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={{ stroke: '#E9ECEF' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={false} tickLine={false} width={40} tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} />
-                <Tooltip content={<ChartTooltip valueFormatter={formatCurrencyCOP} />} cursor={{ fill: '#FAF5FF' }} />
-                <Bar dataKey="value" name="Ingresos" fill="#6025d2" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+                <CartesianGrid vertical={false} stroke={CHART_GRID_STROKE} />
+                <XAxis dataKey="label" tick={CHART_AXIS_TICK} axisLine={CHART_AXIS_LINE} tickLine={false} />
+                <YAxis tick={CHART_AXIS_TICK} axisLine={false} tickLine={false} width={40} tickFormatter={formatMillionsTick} />
+                <Tooltip content={<ChartTooltip valueFormatter={formatCurrencyCOP} />} cursor={CHART_CURSOR} />
+                <Bar dataKey="value" name="Ingresos" fill={CHART_COLORS.primary} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -130,32 +132,31 @@ export default function DashboardPage() {
                 <PieChart>
                   <Pie data={PLAN_DISTRIBUTION} dataKey="valor" nameKey="nombre" innerRadius={54} outerRadius={82} paddingAngle={2} label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`} labelLine={false} isAnimationActive={false}>
                     {PLAN_DISTRIBUTION.map((entry) => (
-                      <Cell key={entry.planId} fill={entry.color} stroke="#FFFFFF" strokeWidth={2} />
+                      <Cell key={entry.planId} fill={entry.color} stroke={CHART_COLORS.surface} strokeWidth={2} />
                     ))}
                   </Pie>
                   <Tooltip content={<ChartTooltip valueFormatter={formatNumber} />} />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="chart-legend">
-                {PLAN_DISTRIBUTION.map((entry) => (
-                  <div key={entry.planId} className="chart-legend-item">
-                    <span className="chart-legend-dot" style={{ backgroundColor: entry.color }} />
-                    <span className="chart-legend-label">{entry.nombre}</span>
-                    <span className="chart-legend-value">{formatNumber(entry.valor)}</span>
-                  </div>
-                ))}
-              </div>
+              <ChartLegend
+                items={PLAN_DISTRIBUTION.map((entry) => ({
+                  id: entry.planId,
+                  label: entry.nombre,
+                  color: entry.color,
+                  value: formatNumber(entry.valor),
+                }))}
+              />
             </div>
           </ChartCard>
 
           <ChartCard title="Uso de módulos" subtitle="% de usuarios activos por módulo">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={MODULE_USAGE_SERIES} layout="vertical" margin={{ top: 8, right: 24, left: 8, bottom: 0 }}>
-                <CartesianGrid horizontal={false} stroke="#F1F3F5" />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={false} tickLine={false} unit="%" />
+                <CartesianGrid horizontal={false} stroke={CHART_GRID_STROKE} />
+                <XAxis type="number" tick={CHART_AXIS_TICK} axisLine={false} tickLine={false} unit="%" />
                 <YAxis type="category" dataKey="label" tick={{ fontSize: 11.5, fill: '#495057', fontWeight: 650 }} axisLine={false} tickLine={false} width={90} />
-                <Tooltip content={<ChartTooltip valueFormatter={(v) => `${v}%`} />} cursor={{ fill: '#FAF5FF' }} />
-                <Bar dataKey="value" name="Uso" fill="#6025d2" radius={[0, 4, 4, 0]} maxBarSize={18} isAnimationActive={false} />
+                <Tooltip content={<ChartTooltip valueFormatter={(v) => `${v}%`} />} cursor={CHART_CURSOR} />
+                <Bar dataKey="value" name="Uso" fill={CHART_COLORS.primary} radius={[0, 4, 4, 0]} maxBarSize={18} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>

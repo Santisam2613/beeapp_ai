@@ -28,7 +28,7 @@ import {
   Bell,
   RefreshCw,
 } from 'lucide-react-native';
-import { getEvents, setEvents, CalendarEvent, Invitee } from './store';
+import { getEvents, setEvents, CalendarEvent, Invitee } from '../../../src/stores/calendarStore';
 
 export default function EventDetailScreen() {
   const router = useRouter();

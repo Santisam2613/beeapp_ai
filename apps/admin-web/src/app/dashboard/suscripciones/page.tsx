@@ -4,9 +4,11 @@ import { Wallet, TrendingUp, UserPlus, UserMinus, TrendingDown, Coins } from 'lu
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import KpiGrid, { type KpiItem } from '@/components/KpiGrid';
 import ChartCard from '@/components/ChartCard';
+import ChartLegend from '@/components/ChartLegend';
 import ChartTooltip from '@/components/ChartTooltip';
 import { SUBSCRIPTION_KPIS, REVENUE_SERIES, SUBSCRIPTIONS_FLOW_SERIES } from '@/mocks/metrics';
 import { formatCurrencyCOP } from '@/utils/format';
+import { CHART_COLORS, CHART_GRID_STROKE, CHART_AXIS_TICK, CHART_AXIS_LINE, CHART_CURSOR, formatMillionsTick } from '@/utils/chart';
 import TransactionsSection from './TransactionsSection';
 import PlansSection from './PlansSection';
 
@@ -31,11 +33,11 @@ export default function SuscripcionesPage() {
           <ChartCard title="Ingresos por mes" subtitle="Ingresos totales facturados">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={REVENUE_SERIES} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#F1F3F5" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={{ stroke: '#E9ECEF' }} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={false} tickLine={false} width={40} tickFormatter={(v) => `${(v / 1000000).toFixed(0)}M`} />
-                <Tooltip content={<ChartTooltip valueFormatter={formatCurrencyCOP} />} cursor={{ fill: '#FAF5FF' }} />
-                <Bar dataKey="value" name="Ingresos" fill="#6025d2" radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
+                <CartesianGrid vertical={false} stroke={CHART_GRID_STROKE} />
+                <XAxis dataKey="label" tick={CHART_AXIS_TICK} axisLine={CHART_AXIS_LINE} tickLine={false} />
+                <YAxis tick={CHART_AXIS_TICK} axisLine={false} tickLine={false} width={40} tickFormatter={formatMillionsTick} />
+                <Tooltip content={<ChartTooltip valueFormatter={formatCurrencyCOP} />} cursor={CHART_CURSOR} />
+                <Bar dataKey="value" name="Ingresos" fill={CHART_COLORS.primary} radius={[4, 4, 0, 0]} maxBarSize={28} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -44,24 +46,20 @@ export default function SuscripcionesPage() {
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 12 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={SUBSCRIPTIONS_FLOW_SERIES} margin={{ top: 8, right: 8, left: -12, bottom: 0 }}>
-                  <CartesianGrid vertical={false} stroke="#F1F3F5" />
-                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={{ stroke: '#E9ECEF' }} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#ADB5BD' }} axisLine={false} tickLine={false} width={30} />
-                  <Tooltip content={<ChartTooltip />} cursor={{ fill: '#FAF5FF' }} />
-                  <Bar dataKey="altas" name="Altas" fill="#6025d2" radius={[4, 4, 0, 0]} maxBarSize={16} isAnimationActive={false} />
-                  <Bar dataKey="cancelaciones" name="Cancelaciones" fill="#d03b3b" radius={[4, 4, 0, 0]} maxBarSize={16} isAnimationActive={false} />
+                  <CartesianGrid vertical={false} stroke={CHART_GRID_STROKE} />
+                  <XAxis dataKey="label" tick={CHART_AXIS_TICK} axisLine={CHART_AXIS_LINE} tickLine={false} />
+                  <YAxis tick={CHART_AXIS_TICK} axisLine={false} tickLine={false} width={30} />
+                  <Tooltip content={<ChartTooltip />} cursor={CHART_CURSOR} />
+                  <Bar dataKey="altas" name="Altas" fill={CHART_COLORS.primary} radius={[4, 4, 0, 0]} maxBarSize={16} isAnimationActive={false} />
+                  <Bar dataKey="cancelaciones" name="Cancelaciones" fill={CHART_COLORS.negative} radius={[4, 4, 0, 0]} maxBarSize={16} isAnimationActive={false} />
                 </BarChart>
               </ResponsiveContainer>
-              <div className="chart-legend">
-                <div className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ backgroundColor: '#6025d2' }} />
-                  <span className="chart-legend-label">Altas</span>
-                </div>
-                <div className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ backgroundColor: '#d03b3b' }} />
-                  <span className="chart-legend-label">Cancelaciones</span>
-                </div>
-              </div>
+              <ChartLegend
+                items={[
+                  { id: 'altas', label: 'Altas', color: CHART_COLORS.primary },
+                  { id: 'cancelaciones', label: 'Cancelaciones', color: CHART_COLORS.negative },
+                ]}
+              />
             </div>
           </ChartCard>
         </div>

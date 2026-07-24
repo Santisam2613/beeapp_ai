@@ -22,70 +22,15 @@ import {
   Mail,
 } from 'lucide-react-native';
 import FloatingTabBar from '../../../src/components/FloatingTabBar';
+import { MOCK_EMAILS } from '../../../src/mocks/emails';
 
-interface EmailItem {
-  id: string;
-  senderName: string;
-  senderEmail: string;
-  subject: string;
-  body: string;
-  time: string;
-  date: string;
-  isStarred: boolean;
-  hasAttachment: boolean;
-  account: string;
-  initialsColor: string;
-  attachments?: string[];
-}
 
 export default function MailDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
 
   // Mock Emails pool
-  const emails: EmailItem[] = [
-    {
-      id: 'm1',
-      senderName: 'Eduardo Torres',
-      senderEmail: 'etorres@empresa-cliente.com',
-      subject: 'Cotización aprobada para el proyecto Q3',
-      body: 'Hola Santiago,\n\nTe confirmo que la junta directiva aprobó el presupuesto estimado para el proyecto de consultoría en su sesión del martes. Todo el equipo de ventas está entusiasmado por iniciar.\n\nQuedamos a la espera del contrato de servicios final para que nuestro equipo legal lo revise y podamos agendar la reunión de kick-off.\n\nSaludos cordiales,\nEduardo Torres\nDirector de Proyectos',
-      time: '09:15 AM',
-      date: '23 Jul',
-      isStarred: true,
-      hasAttachment: true,
-      account: 'santiago.valencia@consultores.com',
-      initialsColor: '#7C3AED',
-      attachments: ['Presupuesto_Aprobado_Q3.pdf', 'Cronograma_Actividades.xlsx'],
-    },
-    {
-      id: 'm2',
-      senderName: 'María Alejandra Gomez',
-      senderEmail: 'mgomez@consultores.com',
-      subject: 'Minuta de la reunión con el equipo legal',
-      body: 'Hola equipo,\n\nLes comparto los puntos clave tratados en la llamada de ayer respecto a la protección de datos y las nuevas cláusulas NDA para consultores externos.\n\n1. Aprobación del NDA estándar para contratos nuevos.\n2. Almacenamiento seguro de llaves criptográficas.\n3. Protocolo de comunicación con clientes en Colombia.\n\nPor favor revisen los adjuntos antes del viernes.\n\nAtentamente,\nMaría Alejandra Gomez',
-      time: 'Ayer',
-      date: '22 Jul',
-      isStarred: false,
-      hasAttachment: true,
-      account: 'santiago.valencia@consultores.com',
-      initialsColor: '#059669',
-      attachments: ['NDA_Consultores_v2.docx'],
-    },
-    {
-      id: 'm3',
-      senderName: 'Soporte BeeApp',
-      senderEmail: 'soporte@beeapp.ai',
-      subject: 'Bienvenido a BeeApp AI - Primeros pasos',
-      body: '¡Hola Santiago!\n\nTu cuenta ya está lista. Descubre cómo usar los accesos rápidos de correo, notas y el asistente inteligente BeeAI para simplificar tu flujo.\n\nEn este correo encontrarás una pequeña guía rápida:\n- Vincula tus cuentas de Gmail y Outlook desde el Perfil.\n- Utiliza el botón central del chat para interactuar directamente con tu negocio.\n\nEstamos para ayudarte.\nEl equipo de BeeApp',
-      time: '21 Jul',
-      date: '21 Jul',
-      isStarred: true,
-      hasAttachment: false,
-      account: 'ventas@empresa.com',
-      initialsColor: '#D97706',
-    },
-  ];
+  const emails = MOCK_EMAILS;
 
   const email = emails.find((e) => e.id === id) || emails[0];
   

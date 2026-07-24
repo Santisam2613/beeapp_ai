@@ -1,0 +1,148 @@
+
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { colors } from '@beeapp/design-system';
+import { Eye, Edit2, Move, Share2, Download, Trash2, ShieldCheck } from 'lucide-react-native';
+import { StorageItem } from '../../stores/storageStore';
+
+interface StorageContextMenuProps {
+  visible: boolean;
+  item: StorageItem | null;
+  onClose: () => void;
+  onOpenItem: (item: StorageItem) => void;
+  onRename: () => void;
+  onMove: () => void;
+  onShare: () => void;
+  onDownload: () => void;
+  onSign: (item: StorageItem) => void;
+  onDelete: (item: StorageItem) => void;
+}
+
+export default function StorageContextMenu({
+  visible,
+  item,
+  onClose,
+  onOpenItem,
+  onRename,
+  onMove,
+  onShare,
+  onDownload,
+  onSign,
+  onDelete,
+}: StorageContextMenuProps) {
+  return (
+    <Modal transparent visible={visible} animationType="slide">
+      <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose}>
+        <View style={styles.contextMenuSheet}>
+          {item && (
+            <>
+              <View style={styles.menuHeader}>
+                <Text style={styles.menuTitle} numberOfLines={1}>{item.name}</Text>
+                <Text style={styles.menuSub}>{item.type === 'folder' ? 'Carpeta' : item.size}</Text>
+              </View>
+
+              <ScrollView style={{ maxHeight: 350 }}>
+                <TouchableOpacity
+                  style={styles.menuRow}
+                  onPress={() => {
+                    onClose();
+                    onOpenItem(item);
+                  }}
+                >
+                  <Eye size={18} color={colors.neutral.text} />
+                  <Text style={styles.menuRowText}>Abrir / Vista previa</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuRow} onPress={onRename}>
+                  <Edit2 size={18} color={colors.neutral.text} />
+                  <Text style={styles.menuRowText}>Renombrar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuRow} onPress={onMove}>
+                  <Move size={18} color={colors.neutral.text} />
+                  <Text style={styles.menuRowText}>Mover a otra carpeta</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuRow} onPress={onShare}>
+                  <Share2 size={18} color={colors.neutral.text} />
+                  <Text style={styles.menuRowText}>Compartir</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.menuRow} onPress={onDownload}>
+                  <Download size={18} color={colors.neutral.text} />
+                  <Text style={styles.menuRowText}>Descargar</Text>
+                </TouchableOpacity>
+
+                {item.type === 'pdf' && (
+                  <TouchableOpacity
+                    style={styles.menuRow}
+                    onPress={() => {
+                      onClose();
+                      onSign(item);
+                    }}
+                  >
+                    <ShieldCheck size={18} color="#7C3AED" />
+                    <Text style={[styles.menuRowText, { color: '#7C3AED', fontWeight: 'bold' }]}>
+                      Firmar documento
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
+                <TouchableOpacity
+                  style={[styles.menuRow, { borderBottomWidth: 0 }]}
+                  onPress={() => onDelete(item)}
+                >
+                  <Trash2 size={18} color={colors.semantic.error} />
+                  <Text style={[styles.menuRowText, { color: colors.semantic.error }]}>Eliminar</Text>
+                </TouchableOpacity>
+              </ScrollView>
+            </>
+          )}
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(26, 26, 46, 0.4)',
+    justifyContent: 'flex-end',
+  },
+  contextMenuSheet: {
+    backgroundColor: colors.neutral.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+  },
+  menuHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral.gray100,
+    paddingBottom: 12,
+    marginBottom: 12,
+  },
+  menuTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: colors.neutral.text,
+  },
+  menuSub: {
+    fontSize: 12,
+    color: colors.neutral.gray600,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.neutral.gray100,
+    gap: 12,
+  },
+  menuRowText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.neutral.text,
+  },
+});

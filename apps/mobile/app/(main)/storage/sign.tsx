@@ -18,7 +18,7 @@ import {
   RotateCcw,
   ShieldCheck,
 } from 'lucide-react-native';
-import { getItems, setItems, StorageItem } from './store';
+import { getItems, setItems, StorageItem } from '../../../src/stores/storageStore';
 
 export default function SignDocumentScreen() {
   const router = useRouter();

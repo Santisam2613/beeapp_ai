@@ -1,0 +1,129 @@
+
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { colors } from '@beeapp/design-system';
+import { ChevronLeft, Search, Grid, List, ArrowUpDown } from 'lucide-react-native';
+import { SortOption } from '../../utils/storageHelpers';
+
+interface StorageHeaderProps {
+  onBack: () => void;
+  sortBy: SortOption;
+  onSortChange: (next: SortOption) => void;
+  viewMode: 'grid' | 'list';
+  onToggleViewMode: () => void;
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+}
+
+export default function StorageHeader({
+  onBack,
+  sortBy,
+  onSortChange,
+  viewMode,
+  onToggleViewMode,
+  searchQuery,
+  onSearchChange,
+}: StorageHeaderProps) {
+  return (
+    <>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerLeftCol}>
+          <TouchableOpacity onPress={onBack} style={styles.backBtn} activeOpacity={0.7}>
+            <ChevronLeft size={24} color={colors.neutral.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Almacenamiento</Text>
+        </View>
+
+        {/* Sort & View controls */}
+        <View style={styles.headerControls}>
+          <TouchableOpacity
+            onPress={() => {
+              const nextSort: Record<SortOption, SortOption> = { name: 'date', date: 'size', size: 'type', type: 'name' };
+              onSortChange(nextSort[sortBy]);
+            }}
+            style={styles.controlIconBtn}
+            activeOpacity={0.7}
+          >
+            <ArrowUpDown size={18} color={colors.brand.primary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onToggleViewMode} style={styles.controlIconBtn} activeOpacity={0.7}>
+            {viewMode === 'grid' ? (
+              <List size={18} color={colors.brand.primary} />
+            ) : (
+              <Grid size={18} color={colors.brand.primary} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Search */}
+      <View style={styles.searchBarBox}>
+        <Search size={18} color={colors.neutral.gray500} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar archivos y carpetas..."
+          placeholderTextColor={colors.neutral.gray500}
+          value={searchQuery}
+          onChangeText={onSearchChange}
+        />
+      </View>
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    backgroundColor: colors.neutral.white,
+    borderBottomWidth: 1,
+    borderColor: colors.neutral.gray100,
+  },
+  headerLeftCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtn: {
+    padding: 4,
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.neutral.text,
+  },
+  headerControls: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  controlIconBtn: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: colors.neutral.gray50,
+    borderWidth: 1,
+    borderColor: colors.neutral.gray200,
+  },
+  searchBarBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.neutral.white,
+    borderBottomWidth: 1,
+    borderColor: colors.neutral.gray100,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: colors.neutral.text,
+    paddingVertical: 6,
+    fontWeight: '500',
+  },
+});

@@ -16,23 +16,6 @@ import { ChevronLeft, Phone, Video, MoreVertical, BellOff, Trash2, ShieldAlert }
 import MessageBubble from '../../../src/components/chat/MessageBubble';
 import WriteBar from '../../../src/components/chat/WriteBar';
 
-interface ChatMessage {
-  id: number;
-  senderName?: string;
-  isUser: boolean;
-  type: 'text' | 'image' | 'file' | 'audio';
-  text?: string;
-  mediaUrl?: string;
-  fileName?: string;
-  fileSize?: string;
-  audioDuration?: string;
-  status: 'sent' | 'delivered' | 'read';
-  time: string;
-  replyTo?: {
-    sender: string;
-    text: string;
-  };
-}
 
 export default function ConversationScreen() {
   const router = useRouter();
@@ -49,57 +32,7 @@ export default function ConversationScreen() {
   const [longPressActive, setLongPressActive] = useState<number | null>(null);
   
   // Historical Messages Mock State
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 1,
-      senderName: 'Carlos Mendoza',
-      isUser: false,
-      type: 'text' as const,
-      text: 'Hola Santiago, ¿cómo estás? Te escribo para confirmar la reunión.',
-      time: '12:00',
-      status: 'read' as const,
-    },
-    {
-      id: 2,
-      isUser: true,
-      type: 'text' as const,
-      text: '¡Hola Carlos! Todo bien por aquí. Sí, claro, confírmame la hora.',
-      time: '12:02',
-      status: 'read' as const,
-      replyTo: {
-        sender: 'Carlos Mendoza',
-        text: 'Hola Santiago, ¿cómo estás? Te escribo para confirmar la reunión.',
-      },
-    },
-    {
-      id: 3,
-      senderName: 'Carlos Mendoza',
-      isUser: false,
-      type: 'file' as const,
-      fileName: 'Propuesta_Comercial_BeeApp.pdf',
-      fileSize: '1.4 MB',
-      time: '12:05',
-      status: 'read' as const,
-    },
-    {
-      id: 4,
-      isUser: true,
-      type: 'audio' as const,
-      audioDuration: '0:14',
-      time: '12:08',
-      status: 'read' as const,
-    },
-    {
-      id: 5,
-      senderName: 'Carlos Mendoza',
-      isUser: false,
-      type: 'image' as const,
-      mediaUrl: 'https://picsum.photos/400/300',
-      text: 'Esta es la captura de los avances del diseño que te comentaba.',
-      time: '12:10',
-      status: 'read' as const,
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(MOCK_CONVERSATION_MESSAGES);
 
   const handleSendMessage = (text: string) => {
     const newMsg = {
@@ -335,6 +268,7 @@ export default function ConversationScreen() {
 
 // Separate helper import for overlay backdrop
 import { TouchableWithoutFeedback } from 'react-native';
+import { ChatMessage, MOCK_CONVERSATION_MESSAGES } from '../../../src/mocks/chats';
 
 const styles = StyleSheet.create({
   safeArea: {

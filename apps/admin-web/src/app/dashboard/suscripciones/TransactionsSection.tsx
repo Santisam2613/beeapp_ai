@@ -10,20 +10,14 @@ import PlanBadge from '@/components/PlanBadge';
 import { MOCK_TRANSACTIONS } from '@/mocks/transactions';
 import type { Transaction } from '@/mocks/types';
 import { formatCurrencyCOP, formatDate } from '@/utils/format';
+import { TRANSACTION_TIPO_LABELS } from '@/utils/labels';
 
 const PAGE_SIZE = 6;
-
-const TIPO_LABELS: Record<Transaction['tipo'], string> = {
-  alta: 'Alta',
-  renovacion: 'Renovación',
-  cancelacion: 'Cancelación',
-  reembolso: 'Reembolso',
-};
 
 const COLUMNS: DataTableColumn<Transaction>[] = [
   { key: 'usuario', header: 'Usuario', render: (row) => row.usuarioNombre },
   { key: 'plan', header: 'Plan', render: (row) => <PlanBadge planId={row.planId} /> },
-  { key: 'tipo', header: 'Tipo', render: (row) => TIPO_LABELS[row.tipo], hideOnMobile: true },
+  { key: 'tipo', header: 'Tipo', render: (row) => TRANSACTION_TIPO_LABELS[row.tipo], hideOnMobile: true },
   { key: 'estado', header: 'Estado', render: (row) => <StatusBadge status={row.estado} /> },
   { key: 'monto', header: 'Monto', render: (row) => formatCurrencyCOP(row.monto), align: 'right' },
   { key: 'fecha', header: 'Fecha', render: (row) => formatDate(row.fecha), align: 'right', hideOnMobile: true },
@@ -52,7 +46,7 @@ export default function TransactionsSection() {
       id: 'tipo',
       label: 'Tipo',
       value: tipo,
-      options: Object.entries(TIPO_LABELS).map(([value, label]) => ({ value, label })),
+      options: Object.entries(TRANSACTION_TIPO_LABELS).map(([value, label]) => ({ value, label })),
     },
   ];
 
@@ -120,7 +114,7 @@ export default function TransactionsSection() {
             </div>
             <div className="detail-row">
               <span className="detail-row-label">Tipo</span>
-              <span className="detail-row-value">{TIPO_LABELS[selected.tipo]}</span>
+              <span className="detail-row-value">{TRANSACTION_TIPO_LABELS[selected.tipo]}</span>
             </div>
             <div className="detail-row">
               <span className="detail-row-label">Estado</span>

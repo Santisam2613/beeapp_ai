@@ -19,11 +19,8 @@ import {
   FileText,
 } from 'lucide-react-native';
 import FloatingTabBar from '../../../src/components/FloatingTabBar';
+import { SENDER_ACCOUNTS } from '../../../src/mocks/emails';
 
-const SENDER_ACCOUNTS = [
-  'santiago.valencia@consultores.com',
-  'ventas@empresa.com',
-];
 
 export default function MailComposeScreen() {
   const router = useRouter();

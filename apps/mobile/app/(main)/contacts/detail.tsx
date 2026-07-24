@@ -28,95 +28,9 @@ import {
   ArrowUpRight,
   PhoneOff,
 } from 'lucide-react-native';
+import { ALL_CONTACT_DETAILS, CONTACT_CALLS } from '../../../src/mocks/contacts';
 
 
-interface ContactDetail {
-  id: string;
-  name: string;
-  profession: string;
-  company: string;
-  activity: string;
-  phone: string;
-  email: string;
-  interests: string[];
-  initials: string;
-  color: string;
-  online: boolean;
-}
-
-const ALL_CONTACT_DETAILS: Record<string, ContactDetail> = {
-  c1: {
-    id: 'c1',
-    name: 'Carlos Mendoza',
-    profession: 'Abogado Corporativo',
-    company: 'Mendoza & Asociados',
-    activity: 'Servicios Legales',
-    phone: '+57 300 456 7890',
-    email: 'carlos@mendoza-asociados.com',
-    interests: ['Startups', 'Finanzas', 'Propiedad Intelectual'],
-    initials: 'CM',
-    color: '#EBF5FF',
-    online: true,
-  },
-  c2: {
-    id: 'c2',
-    name: 'Eduardo Torres',
-    profession: 'Director de Ventas',
-    company: 'Tech Solutions Ltd.',
-    activity: 'Tecnología e Información',
-    phone: '+57 312 987 6543',
-    email: 'eduardo.torres@techsolutions.com',
-    interests: ['Ventas B2B', 'SaaS', 'Negociación'],
-    initials: 'ET',
-    color: '#FEF3C7',
-    online: false,
-  },
-  c3: {
-    id: 'c3',
-    name: 'María Gómez',
-    profession: 'Contadora Pública',
-    company: 'Gómez Consultores',
-    activity: 'Contabilidad y Auditoría',
-    phone: '+57 315 123 4567',
-    email: 'maria.gomez@gomez-consultores.co',
-    interests: ['Impuestos', 'Finanzas Corporativas', 'Pymes'],
-    initials: 'MG',
-    color: '#ECFDF5',
-    online: true,
-  },
-  c4: {
-    id: 'c4',
-    name: 'Sofía Castro',
-    profession: 'Diseñadora UX/UI',
-    company: 'Creative Studio',
-    activity: 'Diseño e Interfaces',
-    phone: '+57 320 888 9900',
-    email: 'sofia.castro@creativestudio.design',
-    interests: ['Figma', 'Mobile Design', 'User Research'],
-    initials: 'SC',
-    color: '#F3E8FF',
-    online: false,
-  },
-};
-
-// Call history mock for c1
-const CONTACT_CALLS: Record<string, { type: 'incoming' | 'outgoing' | 'missed'; isVideo: boolean; time: string; duration: string }[]> = {
-  c1: [
-    { type: 'incoming', isVideo: false, time: 'Hoy, 10:15 AM', duration: '5 min 23s' },
-    { type: 'missed', isVideo: false, time: '21 Jul, 02:10 PM', duration: '0s' },
-    { type: 'outgoing', isVideo: true, time: '18 Jul, 11:30 AM', duration: '15 min 45s' },
-  ],
-  c2: [
-    { type: 'missed', isVideo: true, time: 'Hoy, 08:30 AM', duration: '0s' },
-    { type: 'incoming', isVideo: false, time: '19 Jul, 04:20 PM', duration: '3 min 12s' },
-  ],
-  c3: [
-    { type: 'outgoing', isVideo: false, time: 'Ayer, 03:45 PM', duration: '12 min 10s' },
-  ],
-  c4: [
-    { type: 'incoming', isVideo: true, time: '15 Jul, 01:15 PM', duration: '8 min 05s' },
-  ],
-};
 
 export default function ContactDetailScreen() {
   const router = useRouter();

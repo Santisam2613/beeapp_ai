@@ -11,18 +11,8 @@ import {
 import { useRouter } from 'expo-router';
 import { colors } from '@beeapp/design-system';
 import { ChevronLeft, Check, Sparkles, Database, AlertCircle, RefreshCw, CreditCard } from 'lucide-react-native';
+import { BENEFICIOS_PLUS } from '../../../src/mocks/subscription';
 
-const BENEFICIOS_PLUS = [
-  'Sin anuncios publicitarios',
-  'Almacenamiento ilimitado en la nube',
-  'Copias de seguridad automáticas de chats',
-  'Chats ocultos protegidos con código PIN',
-  'Firma digital de documentos integrada',
-  'Historial de versiones completo',
-  'Hasta 5 dispositivos conectados',
-  'Catálogo avanzado de productos',
-  'Perfil de negocio destacado en búsquedas',
-];
 
 export default function SubscriptionScreen() {
   const router = useRouter();

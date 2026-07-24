@@ -20,7 +20,7 @@ import {
   Calendar,
   Video,
 } from 'lucide-react-native';
-import { getEvents, setEvents, CalendarEvent, MOCK_CONTACTS, Invitee } from './store';
+import { getEvents, setEvents, CalendarEvent, MOCK_CONTACTS, Invitee } from '../../../src/stores/calendarStore';
 
 export default function EditEventScreen() {
   const router = useRouter();

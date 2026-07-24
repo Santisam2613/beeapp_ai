@@ -14,6 +14,7 @@ import { colors } from '@beeapp/design-system';
 import { SquarePen, Search, Plus } from 'lucide-react-native';
 import FloatingTabBar from '../../../src/components/FloatingTabBar';
 import ChatListItem from '../../../src/components/chat/ChatListItem';
+import { MOCK_CHATS, MOCK_STORIES } from '../../../src/mocks/chats';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -22,66 +23,10 @@ export default function ChatListScreen() {
   const [searchText, setSearchText] = useState('');
 
   // Interactive Mock Chat List State
-  const [chats, setChats] = useState([
-    {
-      id: '1',
-      name: 'Carlos Mendoza',
-      lastMessage: 'Claro, nos vemos en la tarde para revisar la propuesta de BeeApp.',
-      time: '14:32',
-      unreadCount: 2,
-      isGroup: false,
-      status: 'read' as const,
-      online: true,
-      isPinned: true,
-      isMuted: false,
-    },
-    {
-      id: '2',
-      name: 'Equipo de Desarrollo 🐝',
-      lastMessage: 'Santiago: Acabo de subir el patch de expo-router a GitHub.',
-      time: '12:15',
-      unreadCount: 0,
-      isGroup: true,
-      status: 'read' as const,
-      online: false,
-      isPinned: true,
-      isMuted: true,
-    },
-    {
-      id: '3',
-      name: 'Mariana Gómez',
-      lastMessage: '¿Lograste firmar el documento del contrato?',
-      time: 'Ayer',
-      unreadCount: 0,
-      isGroup: false,
-      status: 'delivered' as const,
-      online: false,
-      isPinned: false,
-      isMuted: false,
-    },
-    {
-      id: '4',
-      name: 'Alejandro Reyes (Soporte)',
-      lastMessage: 'Tu solicitud #1425 ha sido resuelta con éxito.',
-      time: 'Ayer',
-      unreadCount: 0,
-      isGroup: false,
-      status: 'sent' as const,
-      online: true,
-      isPinned: false,
-      isMuted: false,
-    },
-  ]);
+  const [chats, setChats] = useState(MOCK_CHATS);
 
   // Mock Stories (Status)
-  const stories = [
-    { id: 'tu', name: 'Tu estado', hasActive: false, isUser: true },
-    { id: '1', name: 'Carlos', hasActive: true, initials: 'C' },
-    { id: '2', name: 'Mariana', hasActive: true, initials: 'M' },
-    { id: '3', name: 'Alejandro', hasActive: false, initials: 'A' },
-    { id: '4', name: 'Laura', hasActive: true, initials: 'L' },
-    { id: '5', name: 'Felipe', hasActive: false, initials: 'F' },
-  ];
+  const stories = MOCK_STORIES;
 
   // Actions handlers
   const handlePin = (id: string) => {

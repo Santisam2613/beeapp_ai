@@ -19,7 +19,7 @@ import {
   Play,
   Image as ImageIcon,
 } from 'lucide-react-native';
-import { getItems, setItems, StorageItem } from './store';
+import { getItems, setItems, StorageItem } from '../../../src/stores/storageStore';
 
 export default function FilePreviewScreen() {
   const router = useRouter();

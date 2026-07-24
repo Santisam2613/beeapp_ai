@@ -4,23 +4,9 @@ import { useState } from 'react';
 import { Check, Ban, ShieldOff, RotateCcw } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import type { ReportReason, ReportStatus, SanctionType, UserReport, UserSanction, UserStatus } from '@/mocks/types';
+import type { ReportStatus, SanctionType, UserReport, UserSanction, UserStatus } from '@/mocks/types';
 import { formatDate } from '@/utils/format';
-
-const REASON_LABELS: Record<ReportReason, string> = {
-  spam: 'Spam',
-  acoso: 'Acoso',
-  contenido_inapropiado: 'Contenido inapropiado',
-  suplantacion: 'Suplantación de identidad',
-  otro: 'Otro',
-};
-
-const SANCTION_LABELS: Record<SanctionType, string> = {
-  bloqueo: 'Bloqueo',
-  suspension: 'Suspensión',
-  reactivacion: 'Reactivación',
-  advertencia: 'Advertencia',
-};
+import { REPORT_REASON_LABELS, SANCTION_LABELS } from '@/utils/labels';
 
 interface ModerationSectionProps {
   estado: UserStatus;
@@ -66,7 +52,7 @@ export default function ModerationSection({ estado, reports, sanctions, onReport
           {reports.map((report) => (
             <div key={report.id} className="moderation-report-card">
               <div className="moderation-report-header">
-                <span className="moderation-report-reason">{REASON_LABELS[report.motivo]}</span>
+                <span className="moderation-report-reason">{REPORT_REASON_LABELS[report.motivo]}</span>
                 <StatusBadge status={report.estado} />
               </div>
               <p className="moderation-report-meta">
